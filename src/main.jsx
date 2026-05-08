@@ -189,7 +189,7 @@ function NetworkView({ showToast }) {
       <div className="sectionHead">
         <div>
           <h2>{text.network}</h2>
-          <p>{text.network}\u4ec5\u67e5\u8be2\u516c\u7f51 IP\u3002</p>
+          <p>{`${text.network}\u4ec5\u67e5\u8be2\u516c\u7f51 IP\u3002`}</p>
         </div>
         <button className="primaryButton" onClick={lookup} disabled={loading}>
           <RefreshCcw size={17} />
@@ -200,21 +200,21 @@ function NetworkView({ showToast }) {
         <div className="networkBadge"><Wifi size={34} /></div>
         {info?.ok ? (
           <div className="infoGrid">
-            <InfoItem label="\u516c\u7f51 IP" value={info.ip} strong />
-            <InfoItem label="\u5f52\u5c5e\u5730" value={info.location || "\u672a\u77e5"} />
-            <InfoItem label="\u8fd0\u8425\u5546" value={info.isp || "\u672a\u77e5"} />
-            <InfoItem label="\u7f51\u7edc\u7c7b\u578b" value={info.networkType} />
-            <InfoItem label="\u4ee3\u7406\u72b6\u6001" value={info.proxyStatus} />
-            <InfoItem label="\u68c0\u6d4b\u65f6\u95f4" value={formatDateTime(info.checkedAt)} />
-            <InfoItem label="\u6570\u636e\u6e90" value={info.source} />
+            <InfoItem label={"\u516c\u7f51 IP"} value={info.ip} strong />
+            <InfoItem label={"\u5f52\u5c5e\u5730"} value={info.location || "\u672a\u77e5"} />
+            <InfoItem label={"\u8fd0\u8425\u5546"} value={info.isp || "\u672a\u77e5"} />
+            <InfoItem label={"\u7f51\u7edc\u7c7b\u578b"} value={info.networkType} />
+            <InfoItem label={"\u4ee3\u7406\u72b6\u6001"} value={info.proxyStatus} />
+            <InfoItem label={"\u68c0\u6d4b\u65f6\u95f4"} value={formatDateTime(info.checkedAt)} />
+            <InfoItem label={"\u6570\u636e\u6e90"} value={info.source} />
           </div>
         ) : (
           <div className="emptyState">{loading ? "\u6b63\u5728\u83b7\u53d6\u5f53\u524d\u7f51\u7edc\u4fe1\u606f..." : info?.message || "\u6682\u65e0\u7f51\u7edc\u4fe1\u606f"}</div>
         )}
       </div>
       <div className="actionRow">
-        <button className="ghostButton" disabled={!info?.ok} onClick={() => copyText(info.ip)}><Copy size={16} />\u590d\u5236 IP</button>
-        <button className="ghostButton" disabled={!info?.ok} onClick={() => copyText(fullText)}><Copy size={16} />\u590d\u5236\u5b8c\u6574\u4fe1\u606f</button>
+        <button className="ghostButton" disabled={!info?.ok} onClick={() => copyText(info.ip)}><Copy size={16} />{"\u590d\u5236 IP"}</button>
+        <button className="ghostButton" disabled={!info?.ok} onClick={() => copyText(fullText)}><Copy size={16} />{"\u590d\u5236\u5b8c\u6574\u4fe1\u606f"}</button>
       </div>
     </section>
   );
@@ -360,7 +360,7 @@ function PomodoroView({ todos, settings, showToast }) {
                 <button className="ghostButton" onClick={() => {
                   setModal(null);
                   setMode(Number(stats.todayCount || 0) % Number(settings.longBreakEvery || 4) === 0 ? "longBreak" : "shortBreak");
-                }}>\u5f00\u59cb\u4f11\u606f</button>
+                }}>{"\u5f00\u59cb\u4f11\u606f"}</button>
               )}
             </div>
           </div>
@@ -399,7 +399,7 @@ function TodoView({ todos, refreshTodos, showToast }) {
   return (
     <section className="toolSurface">
       <form className="todoComposer" onSubmit={createTodo}>
-        <input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} placeholder="\u8f93\u5165\u65b0\u7684\u5f85\u529e\u4e8b\u9879" />
+        <input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} placeholder={"\u8f93\u5165\u65b0\u7684\u5f85\u529e\u4e8b\u9879"} />
         <select value={draft.priority} onChange={(event) => setDraft({ ...draft, priority: event.target.value })}>
           <option value="low">{text.low}</option>
           <option value="normal">{text.normal}</option>
@@ -407,7 +407,7 @@ function TodoView({ todos, refreshTodos, showToast }) {
         </select>
         <input type="datetime-local" value={draft.dueAt} onChange={(event) => setDraft({ ...draft, dueAt: event.target.value })} />
         <button className="primaryButton"><Plus size={17} />{text.add}</button>
-        <textarea value={draft.notes} onChange={(event) => setDraft({ ...draft, notes: event.target.value })} placeholder="\u5907\u6ce8\uff0c\u53ef\u7559\u7a7a" />
+        <textarea value={draft.notes} onChange={(event) => setDraft({ ...draft, notes: event.target.value })} placeholder={"\u5907\u6ce8\uff0c\u53ef\u7559\u7a7a"} />
       </form>
       <div className="filterTabs">
         {[["open", text.open], ["all", text.all], ["done", text.completed]].map(([key, label]) => (
@@ -415,7 +415,7 @@ function TodoView({ todos, refreshTodos, showToast }) {
         ))}
       </div>
       <div className="todoList">
-        {visibleTodos.length === 0 && <div className="emptyState">\u6ca1\u6709\u5339\u914d\u7684\u5f85\u529e\u9879</div>}
+        {visibleTodos.length === 0 && <div className="emptyState">{"\u6ca1\u6709\u5339\u914d\u7684\u5f85\u529e\u9879"}</div>}
         {visibleTodos.map((todo) => <TodoItem key={todo.id} todo={todo} updateTodo={updateTodo} removeTodo={removeTodo} />)}
       </div>
     </section>
@@ -465,8 +465,8 @@ function TodoItem({ todo, updateTodo, removeTodo }) {
         </div>
       )}
       <div className="itemActions">
-        <button className="iconButton" title="\u7f16\u8f91" onClick={() => setEditing((value) => !value)}><ClipboardList size={17} /></button>
-        <button className="iconButton danger" title="\u5220\u9664" onClick={() => removeTodo(todo.id)}><Trash2 size={17} /></button>
+        <button className="iconButton" title={"\u7f16\u8f91"} onClick={() => setEditing((value) => !value)}><ClipboardList size={17} /></button>
+        <button className="iconButton danger" title={"\u5220\u9664"} onClick={() => removeTodo(todo.id)}><Trash2 size={17} /></button>
       </div>
     </article>
   );
@@ -489,16 +489,16 @@ function SettingsView({ settings, refreshSettings, showToast }) {
   return (
     <section className="toolSurface">
       <form className="settingsGrid" onSubmit={save}>
-        <NumberField label="\u4e13\u6ce8\u65f6\u957f\uff08\u5206\u949f\uff09" value={draft.focusMinutes} onChange={(value) => setDraft({ ...draft, focusMinutes: value })} />
-        <NumberField label="\u77ed\u4f11\u606f\uff08\u5206\u949f\uff09" value={draft.shortBreakMinutes} onChange={(value) => setDraft({ ...draft, shortBreakMinutes: value })} />
-        <NumberField label="\u957f\u4f11\u606f\uff08\u5206\u949f\uff09" value={draft.longBreakMinutes} onChange={(value) => setDraft({ ...draft, longBreakMinutes: value })} />
-        <NumberField label="\u6bcf\u51e0\u4e2a\u756a\u8304\u540e\u957f\u4f11\u606f" value={draft.longBreakEvery} onChange={(value) => setDraft({ ...draft, longBreakEvery: value })} />
-        <NumberField label="\u5f85\u529e\u63d0\u524d\u63d0\u9192\uff08\u5206\u949f\uff09" value={draft.todoReminderMinutes} onChange={(value) => setDraft({ ...draft, todoReminderMinutes: value })} />
+        <NumberField label={"\u4e13\u6ce8\u65f6\u957f\uff08\u5206\u949f\uff09"} value={draft.focusMinutes} onChange={(value) => setDraft({ ...draft, focusMinutes: value })} />
+        <NumberField label={"\u77ed\u4f11\u606f\uff08\u5206\u949f\uff09"} value={draft.shortBreakMinutes} onChange={(value) => setDraft({ ...draft, shortBreakMinutes: value })} />
+        <NumberField label={"\u957f\u4f11\u606f\uff08\u5206\u949f\uff09"} value={draft.longBreakMinutes} onChange={(value) => setDraft({ ...draft, longBreakMinutes: value })} />
+        <NumberField label={"\u6bcf\u51e0\u4e2a\u756a\u8304\u540e\u957f\u4f11\u606f"} value={draft.longBreakEvery} onChange={(value) => setDraft({ ...draft, longBreakEvery: value })} />
+        <NumberField label={"\u5f85\u529e\u63d0\u524d\u63d0\u9192\uff08\u5206\u949f\uff09"} value={draft.todoReminderMinutes} onChange={(value) => setDraft({ ...draft, todoReminderMinutes: value })} />
         <label className="switchField">
-          <span>\u5173\u95ed\u7a97\u53e3\u65f6\u6700\u5c0f\u5316\u5230\u6258\u76d8</span>
+          <span>{"\u5173\u95ed\u7a97\u53e3\u65f6\u6700\u5c0f\u5316\u5230\u6258\u76d8"}</span>
           <input type="checkbox" checked={draft.closeToTray !== "false"} onChange={(event) => setDraft({ ...draft, closeToTray: String(event.target.checked) })} />
         </label>
-        <button className="primaryButton settingsSave">\u4fdd\u5b58\u8bbe\u7f6e</button>
+        <button className="primaryButton settingsSave">{"\u4fdd\u5b58\u8bbe\u7f6e"}</button>
       </form>
     </section>
   );

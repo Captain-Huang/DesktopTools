@@ -5,6 +5,10 @@ import isDev from "electron-is-dev";
 import Database from "better-sqlite3";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const appDataPath = path.join(app.getPath("appData"), "DeskToolkit");
+
+app.setPath("userData", appDataPath);
+app.setPath("sessionData", path.join(appDataPath, "Session"));
 
 let mainWindow;
 let tray;
