@@ -548,6 +548,272 @@ textarea {
   width: fit-content;
 }
 
+.calendarHeader,
+.weatherSearch {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.calendarHeader h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.calendarHeader p {
+  margin: 6px 0 0;
+  max-width: 660px;
+  color: #657383;
+}
+
+.calendarActions {
+  display: flex;
+  gap: 8px;
+}
+
+.calendarLayout {
+  display: grid;
+  grid-template-columns: minmax(560px, 1fr) 240px;
+  gap: 18px;
+}
+
+.calendarBoard {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid #dce3eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.weekday {
+  display: grid;
+  min-height: 28px;
+  place-items: center;
+  color: #657383;
+  font-size: 13px;
+}
+
+.calendarCell {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  align-items: start;
+  min-height: 82px;
+  padding: 8px;
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  color: #1f2933;
+  background: #fbfcfd;
+  text-align: left;
+}
+
+.calendarCell:hover {
+  border-color: #b9c7d8;
+  background: #fff;
+}
+
+.calendarCell.muted {
+  color: #a0aaba;
+  background: #f6f8fa;
+}
+
+.calendarCell.today {
+  border-color: #246bfe;
+}
+
+.calendarCell.selected {
+  box-shadow: 0 0 0 2px rgb(36 107 254 / 16%);
+}
+
+.solarDay {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.lunarDay {
+  margin-top: 8px;
+  color: #6c7a89;
+  font-size: 12px;
+}
+
+.festivalName {
+  margin-top: 3px;
+  color: #c24138;
+  font-size: 12px;
+}
+
+.dayBadge {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dayBadge.rest {
+  color: #2d5d68;
+  background: #dff4f8;
+}
+
+.dayBadge.holiday {
+  color: #8b2f28;
+  background: #ffe0dc;
+}
+
+.dayBadge.workday {
+  color: #5b4a1d;
+  background: #fff0c2;
+}
+
+.dayDetail,
+.currentWeather,
+.forecastList,
+.airPanel {
+  padding: 20px;
+  border: 1px solid #dce3eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.detailDate {
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.detailWeek,
+.detailLunar,
+.detailHoliday {
+  margin-top: 10px;
+  color: #536171;
+}
+
+.detailStatus {
+  display: inline-flex;
+  margin-top: 18px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #2d5d68;
+  background: #dff4f8;
+}
+
+.detailStatus.holiday {
+  color: #8b2f28;
+  background: #ffe0dc;
+}
+
+.detailStatus.workday,
+.detailStatus.work {
+  color: #5b4a1d;
+  background: #fff0c2;
+}
+
+.weatherSearch {
+  align-items: end;
+  justify-content: start;
+}
+
+.weatherSearch .field {
+  width: min(420px, 100%);
+}
+
+.weatherLayout {
+  display: grid;
+  grid-template-columns: minmax(340px, 0.95fr) minmax(360px, 1.05fr);
+  gap: 18px;
+}
+
+.currentWeather {
+  display: grid;
+  gap: 18px;
+}
+
+.weatherPlace {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #536171;
+}
+
+.weatherMain {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: #246bfe;
+}
+
+.temperature {
+  color: #1f2933;
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.condition {
+  margin-top: 6px;
+  color: #657383;
+}
+
+.weatherFacts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.forecastList {
+  display: grid;
+  gap: 10px;
+}
+
+.forecastList h3,
+.airPanel h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.forecastItem {
+  display: grid;
+  grid-template-columns: 110px minmax(70px, 1fr) 86px 80px;
+  gap: 10px;
+  align-items: center;
+  min-height: 38px;
+  padding: 8px 0;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.forecastItem:last-child {
+  border-bottom: 0;
+}
+
+.forecastItem span {
+  color: #657383;
+}
+
+.airPanel {
+  grid-column: 1 / -1;
+}
+
+.aqiNumber {
+  font-size: 42px;
+  font-weight: 700;
+}
+
+.aqiLabel,
+.airMetrics {
+  margin-top: 6px;
+  color: #657383;
+}
+
 .emptyState {
   display: grid;
   min-height: 130px;
@@ -612,8 +878,18 @@ textarea {
 
   .pomodoroLayout,
   .infoGrid,
-  .settingsGrid {
+  .settingsGrid,
+  .calendarLayout,
+  .weatherLayout {
     grid-template-columns: 1fr;
+  }
+
+  .calendarBoard {
+    gap: 6px;
+  }
+
+  .calendarCell {
+    min-height: 76px;
   }
 
   .todoComposer {

@@ -2,10 +2,15 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   AlarmClock,
+  CalendarDays,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
+  CloudSun,
   Copy,
   Globe2,
+  MapPin,
   Pause,
   Play,
   Plus,
@@ -26,6 +31,8 @@ const text = {
   network: "\u7f51\u7edc\u5f52\u5c5e\u5730",
   pomodoro: "\u756a\u8304\u949f",
   todos: "\u5f85\u529e\u9879",
+  calendar: "\u65e5\u5386",
+  weather: "\u5929\u6c14",
   settings: "\u8bbe\u7f6e",
   focus: "\u4e13\u6ce8",
   shortBreak: "\u77ed\u4f11\u606f",
@@ -52,6 +59,29 @@ const text = {
   low: "\u4f4e",
   normal: "\u666e\u901a",
   high: "\u9ad8"
+};
+
+const holidayData = {
+  holidays: {
+    "2025-01-01": "\u5143\u65e6",
+    "2025-01-28": "\u6625\u8282", "2025-01-29": "\u6625\u8282", "2025-01-30": "\u6625\u8282", "2025-01-31": "\u6625\u8282",
+    "2025-02-01": "\u6625\u8282", "2025-02-02": "\u6625\u8282", "2025-02-03": "\u6625\u8282", "2025-02-04": "\u6625\u8282",
+    "2025-04-04": "\u6e05\u660e\u8282", "2025-04-05": "\u6e05\u660e\u8282", "2025-04-06": "\u6e05\u660e\u8282",
+    "2025-05-01": "\u52b3\u52a8\u8282", "2025-05-02": "\u52b3\u52a8\u8282", "2025-05-03": "\u52b3\u52a8\u8282", "2025-05-04": "\u52b3\u52a8\u8282", "2025-05-05": "\u52b3\u52a8\u8282",
+    "2025-05-31": "\u7aef\u5348\u8282", "2025-06-01": "\u7aef\u5348\u8282", "2025-06-02": "\u7aef\u5348\u8282",
+    "2025-10-01": "\u56fd\u5e86\u8282", "2025-10-02": "\u56fd\u5e86\u8282", "2025-10-03": "\u56fd\u5e86\u8282", "2025-10-04": "\u56fd\u5e86\u8282",
+    "2025-10-05": "\u56fd\u5e86\u8282", "2025-10-06": "\u4e2d\u79cb\u8282", "2025-10-07": "\u56fd\u5e86\u8282", "2025-10-08": "\u56fd\u5e86\u8282",
+    "2026-01-01": "\u5143\u65e6", "2026-01-02": "\u5143\u65e6", "2026-01-03": "\u5143\u65e6",
+    "2026-02-15": "\u6625\u8282", "2026-02-16": "\u6625\u8282", "2026-02-17": "\u6625\u8282", "2026-02-18": "\u6625\u8282", "2026-02-19": "\u6625\u8282",
+    "2026-02-20": "\u6625\u8282", "2026-02-21": "\u6625\u8282", "2026-02-22": "\u6625\u8282", "2026-02-23": "\u6625\u8282",
+    "2026-04-04": "\u6e05\u660e\u8282", "2026-04-05": "\u6e05\u660e\u8282", "2026-04-06": "\u6e05\u660e\u8282",
+    "2026-05-01": "\u52b3\u52a8\u8282", "2026-05-02": "\u52b3\u52a8\u8282", "2026-05-03": "\u52b3\u52a8\u8282", "2026-05-04": "\u52b3\u52a8\u8282", "2026-05-05": "\u52b3\u52a8\u8282",
+    "2026-06-19": "\u7aef\u5348\u8282", "2026-06-20": "\u7aef\u5348\u8282", "2026-06-21": "\u7aef\u5348\u8282",
+    "2026-09-25": "\u4e2d\u79cb\u8282", "2026-09-26": "\u4e2d\u79cb\u8282", "2026-09-27": "\u4e2d\u79cb\u8282",
+    "2026-10-01": "\u56fd\u5e86\u8282", "2026-10-02": "\u56fd\u5e86\u8282", "2026-10-03": "\u56fd\u5e86\u8282", "2026-10-04": "\u56fd\u5e86\u8282",
+    "2026-10-05": "\u56fd\u5e86\u8282", "2026-10-06": "\u56fd\u5e86\u8282", "2026-10-07": "\u56fd\u5e86\u8282"
+  },
+  workdays: new Set(["2025-01-26", "2025-02-08", "2025-04-27", "2025-09-28", "2025-10-11", "2026-01-04", "2026-02-14", "2026-02-28", "2026-05-09", "2026-09-20", "2026-10-10"])
 };
 
 const modeConfig = {
@@ -110,6 +140,8 @@ function App() {
     { id: "network", label: text.network, icon: Globe2 },
     { id: "pomodoro", label: text.pomodoro, icon: AlarmClock },
     { id: "todos", label: text.todos, icon: ClipboardList },
+    { id: "calendar", label: text.calendar, icon: CalendarDays },
+    { id: "weather", label: text.weather, icon: CloudSun },
     { id: "settings", label: text.settings, icon: Settings }
   ];
 
@@ -145,6 +177,8 @@ function App() {
         {activeView === "network" && <NetworkView showToast={showToast} />}
         {activeView === "pomodoro" && <PomodoroView todos={todos} settings={settings} showToast={showToast} />}
         {activeView === "todos" && <TodoView todos={todos} refreshTodos={refreshTodos} showToast={showToast} />}
+        {activeView === "calendar" && <CalendarView />}
+        {activeView === "weather" && <WeatherView settings={settings} refreshSettings={refreshSettings} showToast={showToast} />}
         {activeView === "settings" && <SettingsView settings={settings} refreshSettings={refreshSettings} showToast={showToast} />}
       </main>
       {toast && <div className="toast">{toast}</div>}
@@ -157,6 +191,8 @@ function subtitleFor(view) {
     network: "\u67e5\u770b\u5f53\u524d\u516c\u7f51 IP\u3001\u5f52\u5c5e\u5730\u3001\u8fd0\u8425\u5546\u4e0e\u4ee3\u7406\u72b6\u6001",
     pomodoro: "\u7ed1\u5b9a\u5f85\u529e\u9879\u8bb0\u5f55\u4e13\u6ce8\u7edf\u8ba1\uff0c\u7ed3\u675f\u540e\u5f39\u7a97\u63d0\u9192",
     todos: "\u7ba1\u7406\u5e26\u622a\u6b62\u65f6\u95f4\u548c\u4f18\u5148\u7ea7\u7684\u672c\u5730\u5f85\u529e",
+    calendar: "\u6708\u89c6\u56fe\u67e5\u770b\u519c\u5386\u3001\u5468\u672b\u3001\u8282\u5047\u65e5\u4e0e\u8c03\u4f11\u8865\u73ed",
+    weather: "\u624b\u52a8\u8f93\u5165\u57ce\u5e02\uff0c\u67e5\u770b\u5f53\u524d\u5929\u6c14\u3001\u672a\u6765\u9884\u62a5\u548c\u7a7a\u6c14\u8d28\u91cf",
     settings: "\u8c03\u6574\u756a\u8304\u949f\u3001\u63d0\u9192\u4e0e\u7a97\u53e3\u884c\u4e3a"
   }[view];
 }
@@ -472,6 +508,151 @@ function TodoItem({ todo, updateTodo, removeTodo }) {
   );
 }
 
+function CalendarView() {
+  const today = new Date();
+  const [cursor, setCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [selectedDate, setSelectedDate] = useState(toDateKey(today));
+  const cells = useMemo(() => buildCalendarCells(cursor), [cursor]);
+  const selectedInfo = getDayInfo(new Date(`${selectedDate}T00:00:00`));
+
+  function moveMonth(offset) {
+    setCursor((value) => new Date(value.getFullYear(), value.getMonth() + offset, 1));
+  }
+
+  function backToday() {
+    setCursor(new Date(today.getFullYear(), today.getMonth(), 1));
+    setSelectedDate(toDateKey(today));
+  }
+
+  return (
+    <section className="toolSurface">
+      <div className="calendarHeader">
+        <div>
+          <h2>{formatMonthTitle(cursor)}</h2>
+          <p>{"\u4e2d\u56fd\u8282\u5047\u65e5\u6570\u636e\u5185\u7f6e 2025-2026\uff0c\u666e\u901a\u5468\u672b\u6807\u8bb0\u4f11\uff0c\u8282\u5047\u65e5\u6807\u8bb0\u5047\uff0c\u8c03\u4f11\u5468\u672b\u6807\u8bb0\u73ed\u3002"}</p>
+        </div>
+        <div className="calendarActions">
+          <button className="ghostButton" onClick={() => moveMonth(-1)} title={"\u4e0a\u4e00\u6708"}><ChevronLeft size={17} /></button>
+          <button className="ghostButton" onClick={backToday}>{"\u4eca\u5929"}</button>
+          <button className="ghostButton" onClick={() => moveMonth(1)} title={"\u4e0b\u4e00\u6708"}><ChevronRight size={17} /></button>
+        </div>
+      </div>
+      <div className="calendarLayout">
+        <div className="calendarBoard">
+          {["\u4e00", "\u4e8c", "\u4e09", "\u56db", "\u4e94", "\u516d", "\u65e5"].map((day) => <div className="weekday" key={day}>{day}</div>)}
+          {cells.map((date) => {
+            const key = toDateKey(date);
+            const info = getDayInfo(date);
+            return (
+              <button
+                key={key}
+                className={`calendarCell ${date.getMonth() !== cursor.getMonth() ? "muted" : ""} ${key === toDateKey(today) ? "today" : ""} ${key === selectedDate ? "selected" : ""}`}
+                onClick={() => setSelectedDate(key)}
+              >
+                <span className="solarDay">{date.getDate()}</span>
+                {info.badge && <span className={`dayBadge ${info.badgeType}`}>{info.badge}</span>}
+                <span className="lunarDay">{info.lunar}</span>
+                {info.holidayName && <span className="festivalName">{info.holidayName}</span>}
+              </button>
+            );
+          })}
+        </div>
+        <aside className="dayDetail">
+          <div className="detailDate">{selectedDate}</div>
+          <div className="detailWeek">{formatWeekday(new Date(`${selectedDate}T00:00:00`))}</div>
+          <div className="detailLunar">{`${"\u519c\u5386"} ${selectedInfo.lunarFull}`}</div>
+          <div className={`detailStatus ${selectedInfo.badgeType || "work"}`}>{selectedInfo.status}</div>
+          {selectedInfo.holidayName && <div className="detailHoliday">{selectedInfo.holidayName}</div>}
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function WeatherView({ settings, refreshSettings, showToast }) {
+  const [city, setCity] = useState(settings.weatherCity || "\u5317\u4eac");
+  const [weather, setWeather] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setCity(settings.weatherCity || "\u5317\u4eac");
+  }, [settings.weatherCity]);
+
+  useEffect(() => {
+    if (settings.weatherCity) lookup(settings.weatherCity, false);
+  }, [settings.weatherCity]);
+
+  async function lookup(target = city, saveCity = true) {
+    if (!target.trim()) return;
+    setLoading(true);
+    const result = await api.lookupWeather(target);
+    setWeather(result);
+    setLoading(false);
+    if (result.ok && saveCity) {
+      await api.setSettings({ weatherCity: target.trim() });
+      await refreshSettings();
+      showToast("\u5929\u6c14\u57ce\u5e02\u5df2\u66f4\u65b0");
+    }
+  }
+
+  const current = weather?.current;
+  const air = weather?.air;
+
+  return (
+    <section className="toolSurface">
+      <div className="weatherSearch">
+        <label className="field">
+          <span>{"\u57ce\u5e02"}</span>
+          <input value={city} onChange={(event) => setCity(event.target.value)} placeholder={"\u8f93\u5165\u57ce\u5e02\uff0c\u5982\u4e0a\u6d77\u3001\u5317\u4eac"} />
+        </label>
+        <button className="primaryButton" onClick={() => lookup()} disabled={loading}>
+          <RefreshCcw size={17} />
+          {loading ? text.checking : text.refresh}
+        </button>
+      </div>
+      {weather?.ok ? (
+        <div className="weatherLayout">
+          <div className="currentWeather">
+            <div className="weatherPlace"><MapPin size={18} />{weather.city}</div>
+            <div className="weatherMain">
+              <CloudSun size={52} />
+              <div>
+                <div className="temperature">{Math.round(current.temperature_2m)}°C</div>
+                <div className="condition">{weatherCodeText(current.weather_code)}</div>
+              </div>
+            </div>
+            <div className="weatherFacts">
+              <InfoItem label={"\u4f53\u611f\u6e29\u5ea6"} value={`${Math.round(current.apparent_temperature)}°C`} />
+              <InfoItem label={"\u6e7f\u5ea6"} value={`${current.relative_humidity_2m}%`} />
+              <InfoItem label={"\u98ce\u901f"} value={`${Math.round(current.wind_speed_10m)} km/h`} />
+              <InfoItem label={"\u7a7a\u6c14\u8d28\u91cf"} value={air ? `${airQualityText(air.us_aqi)} ${Math.round(air.us_aqi)}` : "\u6682\u65e0"} />
+            </div>
+          </div>
+          <div className="forecastList">
+            <h3>{"\u672a\u6765 7 \u5929"}</h3>
+            {weather.daily.time.map((day, index) => (
+              <div className="forecastItem" key={day}>
+                <span>{formatForecastDay(day)}</span>
+                <strong>{weatherCodeText(weather.daily.weather_code[index])}</strong>
+                <span>{`${Math.round(weather.daily.temperature_2m_min[index])}° / ${Math.round(weather.daily.temperature_2m_max[index])}°`}</span>
+                <span>{`\u964d\u96e8 ${weather.daily.precipitation_probability_max[index] ?? 0}%`}</span>
+              </div>
+            ))}
+          </div>
+          <div className="airPanel">
+            <h3>{"\u7a7a\u6c14\u8d28\u91cf"}</h3>
+            <div className="aqiNumber">{air ? Math.round(air.us_aqi) : "--"}</div>
+            <div className="aqiLabel">{air ? airQualityText(air.us_aqi) : "\u6682\u65e0\u6570\u636e"}</div>
+            {air && <div className="airMetrics">{`PM2.5 ${Math.round(air.pm2_5)}  ·  PM10 ${Math.round(air.pm10)}`}</div>}
+          </div>
+        </div>
+      ) : (
+        <div className="emptyState">{loading ? "\u6b63\u5728\u83b7\u53d6\u5929\u6c14..." : weather?.message || "\u8f93\u5165\u57ce\u5e02\u540e\u67e5\u770b\u5929\u6c14"}</div>
+      )}
+    </section>
+  );
+}
+
 function SettingsView({ settings, refreshSettings, showToast }) {
   const [draft, setDraft] = useState(settings);
 
@@ -494,6 +675,7 @@ function SettingsView({ settings, refreshSettings, showToast }) {
         <NumberField label={"\u957f\u4f11\u606f\uff08\u5206\u949f\uff09"} value={draft.longBreakMinutes} onChange={(value) => setDraft({ ...draft, longBreakMinutes: value })} />
         <NumberField label={"\u6bcf\u51e0\u4e2a\u756a\u8304\u540e\u957f\u4f11\u606f"} value={draft.longBreakEvery} onChange={(value) => setDraft({ ...draft, longBreakEvery: value })} />
         <NumberField label={"\u5f85\u529e\u63d0\u524d\u63d0\u9192\uff08\u5206\u949f\uff09"} value={draft.todoReminderMinutes} onChange={(value) => setDraft({ ...draft, todoReminderMinutes: value })} />
+        <TextField label={"\u9ed8\u8ba4\u5929\u6c14\u57ce\u5e02"} value={draft.weatherCity} onChange={(value) => setDraft({ ...draft, weatherCity: value })} />
         <label className="switchField">
           <span>{"\u5173\u95ed\u7a97\u53e3\u65f6\u6700\u5c0f\u5316\u5230\u6258\u76d8"}</span>
           <input type="checkbox" checked={draft.closeToTray !== "false"} onChange={(event) => setDraft({ ...draft, closeToTray: String(event.target.checked) })} />
@@ -509,6 +691,15 @@ function NumberField({ label, value, onChange }) {
     <label className="field">
       <span>{label}</span>
       <input min="1" type="number" value={value || ""} onChange={(event) => onChange(event.target.value)} />
+    </label>
+  );
+}
+
+function TextField({ label, value, onChange }) {
+  return (
+    <label className="field">
+      <span>{label}</span>
+      <input type="text" value={value || ""} onChange={(event) => onChange(event.target.value)} />
     </label>
   );
 }
@@ -539,6 +730,104 @@ function toDateTimeLocal(value) {
   const date = new Date(value);
   const offset = date.getTimezoneOffset();
   return new Date(date.getTime() - offset * 60 * 1000).toISOString().slice(0, 16);
+}
+
+function buildCalendarCells(cursor) {
+  const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+  const mondayOffset = (first.getDay() + 6) % 7;
+  const start = new Date(first);
+  start.setDate(first.getDate() - mondayOffset);
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    return date;
+  });
+}
+
+function getDayInfo(date) {
+  const key = toDateKey(date);
+  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+  const holidayName = holidayData.holidays[key];
+  const isWorkday = holidayData.workdays.has(key);
+  let badge = "";
+  let badgeType = "";
+  let status = "\u5de5\u4f5c\u65e5";
+  if (isWorkday) {
+    badge = "\u73ed";
+    badgeType = "workday";
+    status = "\u8c03\u4f11\u8865\u73ed";
+  } else if (holidayName) {
+    badge = "\u5047";
+    badgeType = "holiday";
+    status = "\u8282\u5047\u65e5";
+  } else if (isWeekend) {
+    badge = "\u4f11";
+    badgeType = "rest";
+    status = "\u5468\u672b\u4f11\u606f";
+  }
+  return {
+    badge,
+    badgeType,
+    holidayName,
+    status,
+    lunar: formatLunar(date, false),
+    lunarFull: formatLunar(date, true)
+  };
+}
+
+function formatLunar(date, full) {
+  try {
+    const parts = new Intl.DateTimeFormat("zh-CN-u-ca-chinese", {
+      month: "long",
+      day: "numeric"
+    }).formatToParts(date);
+    const month = parts.find((part) => part.type === "month")?.value || "";
+    const day = parts.find((part) => part.type === "day")?.value || "";
+    return full ? `${month}${day}` : day === "\u521d\u4e00" ? month : day;
+  } catch {
+    return "";
+  }
+}
+
+function toDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatMonthTitle(date) {
+  return `${date.getFullYear()} \u5e74 ${date.getMonth() + 1} \u6708`;
+}
+
+function formatWeekday(date) {
+  return new Intl.DateTimeFormat("zh-CN", { weekday: "long" }).format(date);
+}
+
+function formatForecastDay(value) {
+  const date = new Date(`${value}T00:00:00`);
+  return new Intl.DateTimeFormat("zh-CN", { weekday: "short", month: "2-digit", day: "2-digit" }).format(date);
+}
+
+function weatherCodeText(code) {
+  if (code === 0) return "\u6674";
+  if ([1, 2].includes(code)) return "\u5c11\u4e91";
+  if (code === 3) return "\u591a\u4e91";
+  if ([45, 48].includes(code)) return "\u96fe";
+  if ([51, 53, 55, 56, 57].includes(code)) return "\u6bdb\u6bdb\u96e8";
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "\u96e8";
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return "\u96ea";
+  if ([95, 96, 99].includes(code)) return "\u96f7\u9635\u96e8";
+  return "\u672a\u77e5";
+}
+
+function airQualityText(aqi) {
+  if (aqi <= 50) return "\u4f18";
+  if (aqi <= 100) return "\u826f";
+  if (aqi <= 150) return "\u8f7b\u5ea6\u6c61\u67d3";
+  if (aqi <= 200) return "\u4e2d\u5ea6\u6c61\u67d3";
+  if (aqi <= 300) return "\u91cd\u5ea6\u6c61\u67d3";
+  return "\u4e25\u91cd\u6c61\u67d3";
 }
 
 createRoot(document.getElementById("root")).render(<App />);

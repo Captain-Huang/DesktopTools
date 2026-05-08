@@ -9,5 +9,6 @@ contextBridge.exposeInMainWorld("deskToolkit", {
   getSettings: () => ipcRenderer.invoke("settings:get"),
   setSettings: (settings) => ipcRenderer.invoke("settings:set", settings),
   addPomodoroSession: (session) => ipcRenderer.invoke("pomodoro:add-session", session),
-  getPomodoroStats: () => ipcRenderer.invoke("pomodoro:stats")
+  getPomodoroStats: () => ipcRenderer.invoke("pomodoro:stats"),
+  lookupWeather: (city) => ipcRenderer.invoke("weather:lookup", city)
 });

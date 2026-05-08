@@ -56,6 +56,7 @@ function createDatabase() {
   seedSetting("longBreakEvery", "4");
   seedSetting("closeToTray", "true");
   seedSetting("todoReminderMinutes", "10");
+  seedSetting("weatherCity", "\u5317\u4eac");
 }
 
 function seedSetting(key, value) {
@@ -68,7 +69,7 @@ function createWindow() {
     height: 720,
     minWidth: 900,
     minHeight: 620,
-    title: "轻工具箱",
+    title: "\u8f7b\u5de5\u5177\u7bb1",
     backgroundColor: "#f6f7f9",
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
@@ -107,12 +108,12 @@ function createTray() {
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAjUlEQVR4AWP4//8/AyUYTFhYGBkYGP7Dw8MZgMR2dnZGBgYGJgYGBkY2NjYgMcxgYGBkYGBg+P//P8NgwAEmRgYGBjY2NgYGRgYGPz8/IzCMYGBgYGfHh4GLKysoD4KcAJoGJcEwcDAwMDA8P///wzDDAwMDAx8fHxcCjAAGiYmJhZmZmYwMDAAAE8qH4Lxg/wuAAAAAElFTkSuQmCC"
   );
   tray = new Tray(icon);
-  tray.setToolTip("轻工具箱");
+  tray.setToolTip("\u8f7b\u5de5\u5177\u7bb1");
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label: "打开轻工具箱", click: () => showMainWindow() },
+    { label: "\u6253\u5f00\u8f7b\u5de5\u5177\u7bb1", click: () => showMainWindow() },
     { type: "separator" },
     {
-      label: "退出",
+      label: "\u9000\u51fa",
       click: () => {
         shouldQuit = true;
         app.quit();
@@ -248,6 +249,58 @@ function setupIpc() {
       weekSeconds: row.weekSeconds ?? 0
     };
   });
+
+  ipcMain.handle("weather:lookup", async (_event, city) => lookupWeather(city));
+}
+
+async function lookupWeather(city) {
+  const targetCity = String(city || "").trim();
+  if (!targetCity) {
+    return { ok: false, message: "\u8bf7\u8f93\u5165\u57ce\u5e02\u540d\u79f0" };
+  }
+
+  try {
+    const geoUrl = new URL("https://geocoding-api.open-meteo.com/v1/search");
+    geoUrl.searchParams.set("name", targetCity);
+    geoUrl.searchParams.set("count", "1");
+    geoUrl.searchParams.set("language", "zh");
+    geoUrl.searchParams.set("format", "json");
+    const geoResponse = await fetch(geoUrl);
+    const geoData = await geoResponse.json();
+    const place = geoData.results?.[0];
+    if (!place) return { ok: false, message: "\u672a\u627e\u5230\u8be5\u57ce\u5e02" };
+
+    const forecastUrl = new URL("https://api.open-meteo.com/v1/forecast");
+    forecastUrl.searchParams.set("latitude", place.latitude);
+    forecastUrl.searchParams.set("longitude", place.longitude);
+    forecastUrl.searchParams.set("timezone", "auto");
+    forecastUrl.searchParams.set("current", "temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m");
+    forecastUrl.searchParams.set("daily", "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max");
+    forecastUrl.searchParams.set("forecast_days", "7");
+
+    const airUrl = new URL("https://air-quality-api.open-meteo.com/v1/air-quality");
+    airUrl.searchParams.set("latitude", place.latitude);
+    airUrl.searchParams.set("longitude", place.longitude);
+    airUrl.searchParams.set("timezone", "auto");
+    airUrl.searchParams.set("current", "us_aqi,pm2_5,pm10");
+
+    const [forecastResponse, airResponse] = await Promise.all([fetch(forecastUrl), fetch(airUrl)]);
+    const forecast = await forecastResponse.json();
+    const air = await airResponse.json();
+
+    return {
+      ok: true,
+      city: [place.name, place.admin1, place.country].filter(Boolean).join(" "),
+      latitude: place.latitude,
+      longitude: place.longitude,
+      checkedAt: new Date().toISOString(),
+      current: forecast.current,
+      daily: forecast.daily,
+      air: air.current || null
+    };
+  } catch (error) {
+    return { ok: false, message: error.message || "\u5929\u6c14\u67e5\u8be2\u5931\u8d25" };
+  }
 }
 
 async function lookupIpLocation() {
@@ -255,7 +308,7 @@ async function lookupIpLocation() {
   try {
     const response = await fetch("http://ip-api.com/json/?fields=status,message,query,country,regionName,city,isp,org,as,timezone,proxy,hosting,mobile");
     const data = await response.json();
-    if (data.status !== "success") throw new Error(data.message || "IP 查询失败");
+    if (data.status !== "success") throw new Error(data.message || "IP \u67e5\u8be2\u5931\u8d25");
     return {
       ok: true,
       ip: data.query,
@@ -270,13 +323,13 @@ async function lookupIpLocation() {
     try {
       const fallback = await fetch("https://ipwho.is/");
       const data = await fallback.json();
-      if (!data.success) throw new Error(data.message || "IP 查询失败");
+      if (!data.success) throw new Error(data.message || "IP \u67e5\u8be2\u5931\u8d25");
       return {
         ok: true,
         ip: data.ip,
         location: [data.country, data.region, data.city].filter(Boolean).join(" "),
         isp: data.connection?.isp || data.connection?.org || "",
-        networkType: data.type?.toUpperCase() || "未知",
+        networkType: data.type?.toUpperCase() || "\u672a\u77e5",
         proxyStatus: describeFallbackProxy(data),
         checkedAt: startedAt,
         source: "ipwho.is"
@@ -284,7 +337,7 @@ async function lookupIpLocation() {
     } catch (fallbackError) {
       return {
         ok: false,
-        message: fallbackError.message || primaryError.message || "无法获取公网 IP，请检查网络",
+        message: fallbackError.message || primaryError.message || "\u65e0\u6cd5\u83b7\u53d6\u516c\u7f51 IP\uff0c\u8bf7\u68c0\u67e5\u7f51\u7edc",
         checkedAt: startedAt
       };
     }
@@ -292,15 +345,15 @@ async function lookupIpLocation() {
 }
 
 function describeProxy(data) {
-  if (data.proxy || data.hosting) return "可能使用代理/VPN/机房网络";
-  if (data.mobile) return "移动网络，未发现明显代理特征";
-  return "未发现明显代理特征";
+  if (data.proxy || data.hosting) return "\u53ef\u80fd\u4f7f\u7528\u4ee3\u7406/VPN/\u673a\u623f\u7f51\u7edc";
+  if (data.mobile) return "\u79fb\u52a8\u7f51\u7edc\uff0c\u672a\u53d1\u73b0\u660e\u663e\u4ee3\u7406\u7279\u5f81";
+  return "\u672a\u53d1\u73b0\u660e\u663e\u4ee3\u7406\u7279\u5f81";
 }
 
 function describeFallbackProxy(data) {
   const security = data.security || {};
-  if (security.proxy || security.vpn || security.tor || security.hosting) return "可能使用代理/VPN/机房网络";
-  return "未发现明显代理特征";
+  if (security.proxy || security.vpn || security.tor || security.hosting) return "\u53ef\u80fd\u4f7f\u7528\u4ee3\u7406/VPN/\u673a\u623f\u7f51\u7edc";
+  return "\u672a\u53d1\u73b0\u660e\u663e\u4ee3\u7406\u7279\u5f81";
 }
 
 function hasOwn(value, key) {
