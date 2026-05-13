@@ -1,4 +1,4 @@
-# Desk Toolkit
+# Desk Toolkit(Windows版本)
 
 Windows desktop toolkit built with Electron, React, and SQLite.
 
